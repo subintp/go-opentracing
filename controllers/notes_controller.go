@@ -4,16 +4,20 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/subintp/notes/database"
+	"github.com/opentracing/opentracing-go"
 	"github.com/subintp/notes/models"
+	"github.com/subintp/notes/utils"
 )
 
 // GetNote - get note by id
 func GetNote(c *gin.Context) {
-	var note models.Note
+	tracer := opentracing.GlobalTracer()
+	span := tracer.StartSpan("GetNote")
+	defer span.Finish()
 
+	var note models.Note
 	id := c.Params.ByName("id")
-	db := database.GetConnection()
+	db := utils.GetDbConnection()
 
 	if err := db.First(&note, id).Error; err != nil {
 		c.JSON(
@@ -29,8 +33,12 @@ func GetNote(c *gin.Context) {
 
 // GetNotes - get all notes
 func GetNotes(c *gin.Context) {
+	tracer := opentracing.GlobalTracer()
+	span := tracer.StartSpan("GetNotes")
+	defer span.Finish()
+
 	var notes []models.Note
-	db := database.GetConnection()
+	db := utils.GetDbConnection()
 
 	if err := db.Find(&notes).Error; err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -41,8 +49,12 @@ func GetNotes(c *gin.Context) {
 
 // CreateNote - create note
 func CreateNote(c *gin.Context) {
+	tracer := opentracing.GlobalTracer()
+	span := tracer.StartSpan("CreateNote")
+	defer span.Finish()
+
 	var note models.Note
-	db := database.GetConnection()
+	db := utils.GetDbConnection()
 	c.BindJSON(&note)
 
 	if err := db.Create(&note).Error; err != nil {
@@ -54,9 +66,13 @@ func CreateNote(c *gin.Context) {
 
 // UpdateNote - update note
 func UpdateNote(c *gin.Context) {
+	tracer := opentracing.GlobalTracer()
+	span := tracer.StartSpan("UpdateNote")
+	defer span.Finish()
+
 	var note models.Note
 	id := c.Params.ByName("id")
-	db := database.GetConnection()
+	db := utils.GetDbConnection()
 
 	if err := db.First(&note, id).Error; err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -73,9 +89,13 @@ func UpdateNote(c *gin.Context) {
 
 // DeleteNote - delete note by id
 func DeleteNote(c *gin.Context) {
+	tracer := opentracing.GlobalTracer()
+	span := tracer.StartSpan("DeleteNote")
+	defer span.Finish()
+
 	var note models.Note
 	id := c.Params.ByName("id")
-	db := database.GetConnection()
+	db := utils.GetDbConnection()
 
 	if err := db.First(&note, id).Error; err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
