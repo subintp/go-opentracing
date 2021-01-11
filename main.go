@@ -3,12 +3,15 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/subintp/notes/controllers"
+	"github.com/subintp/notes/middlewares"
 	"github.com/subintp/notes/utils"
 	"github.com/subintp/tracer/test"
 )
 
 func main() {
 	r := gin.Default()
+
+	r.Use(middlewares.SimpleMiddleware())
 
 	utils.InitTracer("NoteService")
 
