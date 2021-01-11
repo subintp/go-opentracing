@@ -17,7 +17,9 @@ func GetNote(c *gin.Context) {
 
 	var note models.Note
 	id := c.Params.ByName("id")
-	db := utils.GetDbConnection()
+
+	span, ctx := opentracing.StartSpanFromContext(c, "GetNote")
+	db := utils.GetDB(ctx)
 
 	if err := db.First(&note, id).Error; err != nil {
 		c.JSON(
@@ -38,7 +40,8 @@ func GetNotes(c *gin.Context) {
 	defer span.Finish()
 
 	var notes []models.Note
-	db := utils.GetDbConnection()
+	span, ctx := opentracing.StartSpanFromContext(c, "GetNotes")
+	db := utils.GetDB(ctx)
 
 	if err := db.Find(&notes).Error; err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -54,7 +57,8 @@ func CreateNote(c *gin.Context) {
 	defer span.Finish()
 
 	var note models.Note
-	db := utils.GetDbConnection()
+	span, ctx := opentracing.StartSpanFromContext(c, "CreateNote")
+	db := utils.GetDB(ctx)
 	c.BindJSON(&note)
 
 	if err := db.Create(&note).Error; err != nil {
@@ -72,7 +76,9 @@ func UpdateNote(c *gin.Context) {
 
 	var note models.Note
 	id := c.Params.ByName("id")
-	db := utils.GetDbConnection()
+
+	span, ctx := opentracing.StartSpanFromContext(c, "UpdateNote")
+	db := utils.GetDB(ctx)
 
 	if err := db.First(&note, id).Error; err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -95,7 +101,9 @@ func DeleteNote(c *gin.Context) {
 
 	var note models.Note
 	id := c.Params.ByName("id")
-	db := utils.GetDbConnection()
+
+	span, ctx := opentracing.StartSpanFromContext(c, "DeleteNote")
+	db := utils.GetDB(ctx)
 
 	if err := db.First(&note, id).Error; err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
